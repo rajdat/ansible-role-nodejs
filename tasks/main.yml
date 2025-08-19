@@ -1,49 +1,46 @@
----
 - name: Ensure curl is installed
   apt:
     name: curl
     state: present
-    update_cache: yes
+  update_cache: yes
   become: yes
-
 - name: Setup Node.js repo
-  shell: |
-    curl -sL https://deb.nodesource.com/setup_{{ node_version | regex_replace('^v','') }}.x | bash -
+  shell: >
+    curl -sL https://deb.nodesource.com/setup_{{ node_version |
+    regex_replace('^v','') }}.x | bash -
   args:
     executable: /bin/bash
+    become: yes
+- name: Install Node.js
+  apt:
+    name: nodejs
+    state: latest
+- name: Install useful node-related tools globally
+  community.general.npm:
+    name: "{{ item }}"
+    global: yes
+  loop:
+    - bower
+    - pm2
+    - pm2-logrotate
+    - pino-pretty
+    - forever
+    - pm2-metrics
   become: yes
-
-    - name: Install Node.js
-      apt:
-        name: nodejs
-        state: latest
-
-    - name: Install useful node-related tools globally
-      npm:
-        name: "{{ item }}"
-        global: yes
-      loop:
-        - bower
-        - pm2
-        - pm2-logrotate
-        - pino-pretty
-        - forever
-        - pm2-metrics
-
-    - name: Ensure PM2 is installed
-      command: pm2 --version
-      register: pm2_installed
-      ignore_errors: yes
-      changed_when: false
-
-    - name: Install PM2 logrotate module
-      command: pm2 install pm2-logrotate
-      when: pm2_installed.rc == 0
-      args:
-        creates: /root/.pm2/modules/pm2-logrotate
-
-    - name: Install PM2 metrics module
-      command: pm2 install pm2-metrics
-      when: pm2_installed.rc == 0
-      args:
-        creates: /root/.pm2/modules/pm2-metrics
+- name: Check if PM2 is installed
+  command: pm2 --version
+  register: pm2_installed
+  ignore_errors: yes
+  changed_when: false
+- name: Install PM2 globally if missing
+  community.general.npm:
+    name: pm2
+    global: yes
+  when: pm2_installed.rc != 0
+  become: yes
+- name: Install PM2 metrics module
+  command: pm2 install pm2-metrics
+  when: pm2_installed.rc == 0
+  args:
+    creates: /root/.pm2/modules/pm2-metrics
+    
