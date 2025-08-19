@@ -1,23 +1,41 @@
 ---
-- name: Setup Node.js 20 environment
-  hosts: all
+- name: Ensure curl is installed
+  apt:
+    name: curl
+    state: present
+    update_cache: yes
   become: yes
-  tasks:
 
-    - name: Update apt-cache
-      apt:
-        update_cache: yes
+- name: Setup Node.js repo
+  shell: |
+    curl -sL https://deb.nodesource.com/setup_{{ node_version | regex_replace('^v','') }}.x | bash -
+  args:
+    executable: /bin/bash
+  become: yes
 
-    - name: Install curl
-      apt:
-        name: curl
-        state: present
+- name: Install Node.js
+  apt:
+    name: nodejs
+    state: present
+    update_cache: yes
+  become: yes
 
-    - name: Add Node.js 20 apt source
-      shell: curl -sL https://deb.nodesource.com/setup_20.x | bash -
-      args:
-        warn: false
-      changed_when: false
+- name: Install project dependencies
+  community.general.npm:
+    path: "{{ project_path }}"
+    production: yes
+
+- name: Build project
+  command: npm run build
+  args:
+    chdir: "{{ project_path }}"
+
+- name: Remove source files after build
+  file:
+    path: "{{ project_path }}/src"
+    state: absent
+  when: remove_source | default(false)
+
 
     - name: Install Node.js
       apt:
