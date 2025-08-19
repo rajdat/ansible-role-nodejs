@@ -5,8 +5,8 @@
 
   vars:
     node_version: "v12.16.0"
-    project_path: "/root/ansible"
+    project_path: "/opt/myapp"
     remove_source: true   # set to false if you want to keep source
 
   roles:
-    - ansible-role-nodejs
+    - node_setup
