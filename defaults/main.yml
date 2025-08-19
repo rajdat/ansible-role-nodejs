@@ -4,7 +4,7 @@
   become: yes
 
   vars:
-    node_version: "v12.16.0"
+    node_version: "12.16.0"
     project_path: "/opt/myapp"
     remove_source: true   # set to false if you want to keep source
 
