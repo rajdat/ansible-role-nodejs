@@ -1,3 +1,12 @@
+---
+- name: Setup and build Node.js app
+  hosts: webservers      # 👈 adjust to your inventory group/host
+  become: yes
 
-nodeVersion: "12.16.0"
-remove_source: true
+  vars:
+    node_version: "v12.16.0"
+    project_path: "/root/ansible"
+    remove_source: true   # set to false if you want to keep source
+
+  roles:
+    - ansible-role-nodejs
