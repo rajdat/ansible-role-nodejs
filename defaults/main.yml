@@ -1,6 +1,6 @@
 ---
 - name: Setup and build Node.js app
-  hosts: webservers      # 👈 adjust to your inventory group/host
+  hosts: jsbc      # 👈 adjust to your inventory group/host
   become: yes
 
   vars:
