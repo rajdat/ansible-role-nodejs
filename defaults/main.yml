@@ -9,4 +9,4 @@
     remove_source: true   # set to false if you want to keep source
 
   roles:
-   - node_setup
+   - ansible-role-nodejs
