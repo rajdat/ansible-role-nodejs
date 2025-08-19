@@ -13,30 +13,6 @@
     executable: /bin/bash
   become: yes
 
-- name: Install Node.js
-  apt:
-    name: nodejs
-    state: present
-    update_cache: yes
-  become: yes
-
-- name: Install project dependencies
-  community.general.npm:
-    path: "{{ project_path }}"
-    production: yes
-
-- name: Build project
-  command: npm run build
-  args:
-    chdir: "{{ project_path }}"
-
-- name: Remove source files after build
-  file:
-    path: "{{ project_path }}/src"
-    state: absent
-  when: remove_source | default(false)
-
-
     - name: Install Node.js
       apt:
         name: nodejs
